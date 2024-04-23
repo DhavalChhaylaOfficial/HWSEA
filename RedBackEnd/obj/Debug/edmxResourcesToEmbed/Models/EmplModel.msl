@@ -1,0 +1,17 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Mapping Space="C-S" xmlns="http://schemas.microsoft.com/ado/2009/11/mapping/cs">
+  <EntityContainerMapping StorageEntityContainer="Database_RedModelStoreContainer" CdmEntityContainer="Database_RedEntitiess">
+    <EntitySetMapping Name="TBLEmps">
+      <EntityTypeMapping TypeName="Database_RedModel.TBLEmp">
+        <MappingFragment StoreEntitySet="TBLEmp">
+          <ScalarProperty Name="Id" ColumnName="Id" />
+          <ScalarProperty Name="Name" ColumnName="Name" />
+          <ScalarProperty Name="Designation" ColumnName="Designation" />
+          <ScalarProperty Name="Salary" ColumnName="Salary" />
+          <ScalarProperty Name="Age" ColumnName="Age" />
+          <ScalarProperty Name="Eligible_for_Bonus" ColumnName="Eligible for Bonus" />
+        </MappingFragment>
+      </EntityTypeMapping>
+    </EntitySetMapping>
+  </EntityContainerMapping>
+</Mapping>

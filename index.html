@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>Home</title>
+    <meta name="description" content="">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="bootstrap-5.0.2-dist/css/bootstrap.min.css">
+</head>
+<body>
+
+<div class="container mt-5 text-bg-info p-5">
+    <h1>Insert Data</h1>
+    <form>
+        <div class="form-floating mb-3">
+            <input type="text" class="form-control" id="txtEmpname" placeholder="Employee Name">
+            <label for="txtEmpname">Employee Name <span style="color: red;">*</span></label>
+        </div>
+
+        <div class="form-floating mb-3">
+            <select class="form-select" id="selectDesignation" aria-label="Select Designation">
+                <option selected>Select Designation</option>
+                <option value="Developer">Developer</option>
+                <option value="Front-end">Front-end</option>
+                <option value="Back-end">Back-end</option>
+                <option value="Marketing">Marketing</option>
+            </select>
+            <label for="selectDesignation">Designation<span style="color: red;">*</span></label>
+        </div>
+        <div class="form-floating mb-3">
+            <input type="number" class="form-control" id="txtSalary" placeholder="Salary" required>
+            <label for="txtSalary">Salary<span style="color: red;">*</span></label>
+        </div>
+        <div class="form-floating mb-3">
+            <input type="number" class="form-control" id="txtAge" placeholder="Age" required>
+            <label for="txtAge">Age <span style="color: red;">*</span></label>
+        </div>
+        <center><button type="button" class="btn btn-outline-primary" id="btnAddData">Add Data</button></center>
+    </form>
+</div>
+
+<div class="container mt-5 text-bg-info p-5">
+    <table class="table table-success table-stripped" id="bookTable">
+        <h2>Book Data</h2>
+        <thead>
+            <tr>
+                <th>id</th>
+                <th>Employee Name</th>
+                <th>Designation</th>
+                <th>Salary</th>
+                <th>Age</th>
+                <th>Eligible for bonus</th>
+            </tr>
+        </thead>
+        <tbody></tbody>
+    </table>
+</div>
+
+<script src="jquery.js" defer></script>
+<script src="bootstrap-5.0.2-dist/js/bootstrap.min.js" defer></script>
+<script>
+    document.addEventListener('DOMContentLoaded', fetchData);
+    document.querySelector("#btnAddData").addEventListener('click', addSalary);
+
+    function fetchData() {
+        $.ajax({
+            url: 'http://localhost:60382/GetEmpData',
+            type: 'GET',
+            success: function(response){
+                console.log(response);
+                const tbody = document.querySelector('#bookTable tbody');
+                tbody.innerHTML = "";
+
+                if (response.length === 0) {
+                    const messageRow = document.createElement('tr');
+                    const messageCell = document.createElement('td');
+                    messageCell.colSpan = 6;
+                    messageCell.textContent = 'No data available';
+                    messageRow.appendChild(messageCell);
+                    tbody.appendChild(messageRow);
+                } else {
+                    for (var i = 0; i < response.length; i++){
+                        var tr = document.createElement('tr');
+                        tr.innerHTML = `<td>${response[i]['Id']}</td>
+                        <td>${response[i]['Name']}</td>
+                        <td>${response[i]['Designation']}</td>
+                        <td>${response[i]['Salary']}</td>
+                        <td>${response[i]['Age']}</td>
+                        <td>${response[i]['Eligible_for_Bonus']}</td>`
+                        tbody.appendChild(tr);
+                    }
+                }
+            },
+            error: function(xhr, status, error){
+                console.error('Error:', status, error);
+            }
+        });
+    }
+
+    function addSalary() {
+        const empname = document.querySelector("#txtEmpname").value.trim();
+        const designation = document.querySelector("#selectDesignation").value.trim();
+        const sal = document.querySelector("#txtSalary").value.trim();
+        const Age = document.querySelector("#txtAge").value.trim();
+
+        if (empname == '' || designation == '' || sal == '' || Age == '') {
+            alert("Fields marked with * are required!");
+            return;
+        }
+        let eligibleForBonus = 'no';
+        if (parseInt(Age) > 40 && designation === 'Developer') {
+            eligibleForBonus = 'yes';
+        }
+        
+        const book = {
+            'Name': empname.toLowerCase(),
+            'Designation': designation,
+            'Salary': sal,
+            'Age': Age,
+            'Eligible_for_Bonus': eligibleForBonus,
+        };
+
+        const stringified = JSON.stringify(book);
+        $.ajax({
+            url: 'http://localhost:60382/api/Employee',
+            type: 'POST',
+            data: stringified,
+            contentType: 'application/json',
+            success: function(response) {
+                if (response['output']) {
+                    fetchData();
+                    alert('Data Inserted');
+                } else {
+                    alert(response["message"]);
+                }
+            },
+            error: function(xhr, status, error) {
+                console.error('Error:', status, error);
+            }
+        });
+    }
+</script>
+</body>
+</html>
